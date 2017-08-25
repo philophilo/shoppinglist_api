@@ -55,6 +55,9 @@ class Users(db.Model):
         return user
 
 
+
+
+
 @auth.verify_password
 def verify_password(username_or_token, password):
     user = Users.verify_auth_token(username_or_token)
@@ -66,7 +69,7 @@ def verify_password(username_or_token, password):
     return True
 
 
-@app.route('/api/users', methods=['POST'])
+@app.route('/auth/register', methods=['POST'])
 def new_user():
     username = request.json.get('username')
     password = request.json.get('password')
@@ -82,7 +85,7 @@ def new_user():
             {'Location':url_for('get_user', id=user.id, _extername=True)})
 
 
-@app.route('/api/users/<int:id>')
+@app.route('/auth/users/<int:id>')
 def get_user(id):
     user = Users.query.get(id)
     if not user:
@@ -90,14 +93,14 @@ def get_user(id):
     return jsonify({'username':user.username})
 
 
-@app.route('/api/token', methods=['GET'])
+@app.route('/auth/token', methods=['GET'])
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token(600)
     return jsonify({'token':token.decode('ascii'), 'duration':600})
 
 
-@app.route('/api/users/')
+@app.route('/auth/users/')
 @auth.login_required
 def get_resource():
     return jsonify({'data':'Hello, %s!' % g.user.username})
